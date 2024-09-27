@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const Listing = require("./models/listing.js");
 const path = require("path");
 
+app.use(express.static(path.join(__dirname, 'public')));
 
 main().then(() => {
     console.log("connect to DB");
@@ -15,15 +16,42 @@ async function main() {
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
+app.use(express.urlencoded({extended: true}));
 
 app.get("/", (req, res) => {
     res.send("Hi, I am root");
 });
 
+//Index Route
+
 app.get("/listings", async (req, res) => {
    const allListings = await Listing.find({});
-   res.render("index.ejs",{allListings,initDB});
+   res.render("index.ejs", {allListings});
 });
+
+
+//New Route
+
+app.get("/listings/new", (req, res) => {
+    res.render("new.ejs")
+});
+
+//Show Route
+
+app.get("/listings/:id", async (req, res) => {
+    let {id} = req.params;
+    const listing = await Listing.findById(id);
+    res.render("show.ejs", {listing});
+});
+
+//Create Route
+
+app.post("/listings", async (req, res) => {
+    let listing = req.body.listing;
+    console.log(listing);
+    
+});
+
 
 // app.get("/testListing", async (req, res) => {
 //     let sampleListing = new Listing({
